@@ -170,14 +170,14 @@ var N1_TASKS = [
   {id:'t8', t:'Actualizar una vez al año una planilla que casi nadie consulta.', a:'C', why:'Poca frecuencia y poco valor: probablemente no valga la pena automatizarlo.'}
 ];
 var HUNT = [
-  {t:'Sí, se puede. La herramienta más simple para esto es Zapier, porque reacciona a cada mail que llega.', err:false, why:'Correcto: Zapier reacciona a eventos, como un mail nuevo.'},
-  {t:'En el plan gratuito de Zapier podés armar Zaps de hasta cinco pasos, así que no vas a tener problemas.', err:true, why:'Falso: el plan gratuito permite Zaps de dos pasos (un trigger y una acción).'},
-  {t:'Como disparador, elegí Gmail → “New Invoice Detected”, que detecta solo las facturas.', err:true, why:'Ese trigger no existe. En la ayuda oficial figuran, por ejemplo, “New Email Matching Search” o “New Attachment”.'},
-  {t:'En la búsqueda poné subject:factura has:attachment, así toma solo mails con “factura” en el asunto y un adjunto.', err:false, why:'Correcto: son operadores de búsqueda de Gmail.'},
-  {t:'Como acción, elegí Google Sheets → “Create Spreadsheet Row” y asigná cada dato a su columna.', err:false, why:'Correcto: es una acción real de Google Sheets en Zapier.'},
-  {t:'Como seguramente tu estudio usa Google Workspace con cuenta corporativa, conectá esa cuenta directamente.', err:true, why:'Supuesto oculto: nadie le dijo qué cuenta usan. Además, conectar la cuenta del estudio sin autorización es un riesgo de acceso.'},
+  {t:'Sí, se puede. Como es una tarea repetitiva y basada en una regla, conviene automatizarla.', err:false, why:'Frecuente y con poco valor cognitivo, es del cuadrante “automatizar”.'},
+  {t:'Esta automatización usa inteligencia artificial para decidir cuáles mails son facturas.', err:true, why:'Falso: una regla fija (asunto con “factura” y un adjunto) no es IA. Es automatización por reglas: hace siempre lo mismo.'},
+  {t:'La condición puede ser que el asunto diga “factura” y que el mail tenga un archivo adjunto.', err:false, why:'Es la condición del ejemplo del socio.'},
+  {t:'Como acción, la herramienta agrega una fila en la planilla con la fecha, el remitente y el asunto.', err:false, why:'Es la acción que se repite con cada mail.'},
+  {t:'Como seguramente tu estudio usa la cuenta de correo corporativa de Google, conectá esa cuenta directamente.', err:true, why:'Supuesto oculto: nadie le dijo qué cuenta usan. Además, conectar la cuenta del estudio sin autorización es un riesgo de acceso.'},
   {t:'Para probarlo bien, pegame acá la última factura real de un cliente con su CUIT y la reviso.', err:true, why:'Riesgo de privacidad: nunca se pasan datos reales de clientes a una IA. Se prueba con datos ficticios.'},
-  {t:'Antes de activarlo, probá cada paso con el botón Test y revisá que la fila se haya creado bien.', err:false, why:'Correcto: probar antes de publicar es buena práctica.'}
+  {t:'Una vez armada, nadie necesita revisar la planilla: la automatización no se equivoca.', err:true, why:'Falso: si la regla está mal, repite el error en cada caso. Por eso existe el control humano (“Revisado por”).'},
+  {t:'Antes de usarla, conviene probarla con un mail que debe registrarse y con otro que no.', err:false, why:'Es la prueba positiva y prueba negativa.'}
 ];
 var AGQ = [
   {id:'g1', t:'Una empleada copia una factura en un chat de IA y le pregunta a qué cuenta va.', a:'G', why:'Una persona inicia la consulta y decide qué hacer con la respuesta: IA generativa como asistente.'},

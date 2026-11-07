@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Misión: el pedido del socio</title>
+<style>
+:root{
+  --navy:#24093F; --teal:#E6007E; --teal-l:#FFE1F2; --gray:#FBF2F8; --line:#EBC6DD;
+  --text:#24093F; --muted:#6E5A78; --red:#C2185B; --gold:#C6FF00; --bg:#FFF5FB; --card:#FFFFFF;
+  --lime:#C6FF00; --violet:#7B2FF7;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;font-size:17px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+.mono{font-family:"Courier New",monospace;font-weight:bold;color:var(--teal);letter-spacing:.02em}
+header.top{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header.top .brand{font-weight:bold;font-size:18px;margin-right:auto}
+header.top .brand small{display:block;font-family:"Courier New",monospace;color:#FF8AD0;font-size:12px;font-weight:bold}
+.pill{background:#ffffff1a;border-radius:999px;padding:6px 12px;font-size:15px;white-space:nowrap}
+.pill b{color:var(--lime)}
+.btn{border:0;border-radius:8px;padding:10px 16px;background:var(--teal);color:#fff;font-weight:bold;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn.sec{background:var(--gray);color:var(--navy);border:1px solid var(--line)}
+.btn.dark{background:var(--navy)}
+.btn.small{padding:6px 10px;font-size:15px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+main{max-width:1000px;margin:0 auto;padding:16px}
+nav.levels{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 18px}
+nav.levels .day{width:100%;font-family:"Courier New",monospace;font-weight:bold;color:var(--teal);font-size:13px;margin-top:6px}
+.lv{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--gray);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:15px}
+.lv .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--navy);color:#fff;font-weight:bold;font-size:14px;flex:none}
+.lv.done .n{background:var(--teal)}
+.lv{background:#fff}
+.lv.active{box-shadow:0 0 0 3px var(--lime) inset}
+header.top{background:linear-gradient(90deg,#24093F,#4A0E6B 60%,#7B2FF7)}
+.socio{background:linear-gradient(135deg,#24093F,#4A0E6B)}
+.socio .av{background:var(--teal);box-shadow:0 0 0 3px var(--lime)}
+.btn{box-shadow:0 3px 0 #9E0057}
+.btn.sec,.btn.dark{box-shadow:none}
+.btn.dark{background:var(--violet)}
+.opt.ok{background:var(--teal);color:#fff}
+h1{color:var(--navy)}
+.kicker{color:var(--teal)}
+.lv.locked{opacity:.45;cursor:not-allowed}
+.lv.active{outline:3px solid var(--teal);background:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin:0 0 16px}
+.card.tint{background:var(--teal-l);border-color:#FFB3DE}
+.card.dark{background:var(--navy);color:#fff;border-color:var(--navy)}
+h1{font-size:28px;margin:4px 0 6px;color:var(--navy)}
+h2{font-size:21px;margin:0 0 10px;color:var(--navy)}
+h3{font-size:18px;margin:14px 0 8px;color:var(--teal)}
+.kicker{font-family:"Courier New",monospace;font-weight:bold;color:var(--teal);font-size:14px}
+.socio{display:flex;gap:14px;align-items:flex-start;background:var(--navy);color:#fff;border-radius:12px;padding:16px;margin-bottom:16px}
+.socio .av{flex:none;width:52px;height:52px;border-radius:50%;background:var(--teal);display:grid;place-items:center;font-weight:bold;font-size:20px}
+.socio .who{font-size:13px;color:var(--lime);font-family:"Courier New",monospace;font-weight:bold}
+.socio p{margin:4px 0 0;font-style:italic}
+label.f{display:block;margin:10px 0 4px;font-weight:bold}
+label.f small{font-weight:normal;color:var(--muted)}
+input[type=text],textarea,select{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:#fff}
+textarea{min-height:70px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:720px){.grid2,.grid3{grid-template-columns:1fr}}
+.task{border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0;background:#fff}
+.task .opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.opt{border:1px solid var(--line);background:var(--gray);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:15px}
+.opt:hover{border-color:var(--teal)}
+.opt.ok{background:var(--teal);color:#fff;border-color:var(--teal)}
+.opt.bad{background:var(--red);color:#fff;border-color:var(--red)}
+.opt[disabled]{cursor:default}
+.fb{margin-top:8px;font-size:15px;padding:8px 10px;border-radius:8px}
+.fb.ok{background:var(--teal-l)}
+.fb.bad{background:#FFE0E6}
+.sentence{display:block;padding:8px 10px;margin:4px 0;border-radius:8px;cursor:pointer;border:1px solid transparent}
+.sentence:hover{background:var(--gray)}
+.sentence.sel{background:#F4FFC7;border-color:#9BCB00}
+.sentence.hit{background:var(--teal-l);border-color:var(--teal)}
+.sentence.miss{background:#FFE0E6;border-color:var(--red)}
+.sentence.fp{background:#eee;border-color:#999;text-decoration:line-through}
+.aibox{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:Arial}
+.aibox .tag{font-family:"Courier New",monospace;font-weight:bold;font-size:13px;color:var(--muted)}
+.checks label{display:flex;gap:8px;align-items:flex-start;margin:6px 0;cursor:pointer}
+.checks input{margin-top:4px}
+table.mx{width:100%;border-collapse:collapse;font-size:15px}
+table.mx th{background:var(--navy);color:#fff;text-align:left;padding:7px;font-size:14px}
+table.mx td{border:1px solid var(--line);padding:5px;vertical-align:top}
+table.mx input[type=text],table.mx select{padding:6px;font-size:14px}
+.tablewrap{overflow-x:auto}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.missing{background:#FFE0E6;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:15px}
+.missing ul{margin:6px 0 0 18px;padding:0}
+.badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--lime);border:1px solid #9BCB00;color:var(--navy);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:bold}
+.badge .dot{width:10px;height:10px;border-radius:50%;background:var(--teal)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;box-shadow:0 6px 24px #0004;z-index:50;max-width:92vw;font-size:16px}
+.modal-bg{position:fixed;inset:0;background:#0d1b2a99;z-index:40;display:grid;place-items:center;padding:16px}
+.modal{background:#fff;border-radius:12px;max-width:720px;width:100%;padding:20px;max-height:90vh;overflow:auto}
+.codebox{font-family:"Courier New",monospace;font-size:12px;word-break:break-all;min-height:110px}
+.thumbs{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.thumbs figure{margin:0;border:1px solid var(--line);border-radius:8px;padding:6px;max-width:300px}
+.thumbs img{max-width:100%;display:block;border-radius:4px}
+.thumbs figcaption{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:6px;margin-top:4px}
+.hint{color:var(--muted);font-size:15px}
+.welcome-steps{counter-reset:s;list-style:none;padding:0;margin:8px 0}
+.welcome-steps li{counter-increment:s;position:relative;padding-left:40px;margin:10px 0}
+.welcome-steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:bold}
+/* Reporte */
+#report{display:none}
+.rp h1{font-size:24px}
+.rp h2{font-size:18px;border-bottom:2px solid var(--teal);padding-bottom:3px;margin-top:18px}
+.rp dl{display:grid;grid-template-columns:220px 1fr;gap:4px 12px;margin:6px 0;font-size:14px}
+.rp dt{font-weight:bold;color:var(--navy)}
+.rp dd{margin:0;white-space:pre-wrap}
+.rp table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+.rp th{background:var(--navy);color:#fff;text-align:left;padding:5px}
+.rp td{border:1px solid var(--line);padding:5px;vertical-align:top}
+.rp img{max-width:100%;max-height:420px;border:1px solid var(--line);margin-top:6px}
+.rp .meta{font-size:13px;color:var(--muted)}
+@media print{
+  header.top,nav.levels,#app,.toast,.modal-bg,.noprint{display:none !important}
+  #report{display:block !important}
+  body{font-size:12px}
+  main{max-width:none;padding:0}
+  .rp h2{break-after:avoid}
+  .rp figure{break-inside:avoid}
+  .rp th{background:none !important;color:var(--navy) !important;border:1px solid var(--line);border-bottom:2px solid var(--navy)}
+  .rp tr{break-inside:avoid}
+  @page{size:letter;margin:14mm}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><small>// GESTIÓN DE IT · UADE</small>Misión: el pedido del socio</div>
+  <span class="pill" id="pTeam">Equipo: —</span>
+  <span class="pill">Puntos: <b id="pPoints">0</b></span>
+  <button class="btn small sec" id="bSave" type="button">Guardar / cargar partida</button>
+</header>
+<main>
+  <nav class="levels" id="nav"></nav>
+  <div id="app"></div>
+  <div id="report" class="rp"></div>
+</main>
+
+<script>
+(function(){
+'use strict';
+var KEY = 'mision-socio-v1';
+var LEVELS = [
+  {id:'n1', day:1, t:'Clasificar'},
+  {id:'n2', day:1, t:'Interrogar a la IA'},
+  {id:'n3', day:1, t:'El agente'},
+  {id:'n4', day:1, t:'Riesgos y controles'},
+  {id:'n5', day:2, t:'Construir'},
+  {id:'n6', day:2, t:'¿Resistió?'},
+  {id:'fin', day:2, t:'Reporte de misión'}
+];
+
+/* ---------- Datos de los minijuegos ---------- */
+var Q = {A:'Automatizar', U:'Aumentar capacidades del profesional', M:'Mantener intervención profesional', C:'Analizar costo-beneficio'};
+var N1_TASKS = [
+  {id:'t1', t:'Registrar en una planilla cada factura de servicios que llega por mail.', a:'A', why:'Se repite mucho y sigue una regla fija: “si llega una factura, anotala”.'},
+  {id:'t2', t:'Clasificar los gastos de tarjeta de un cliente en cuentas contables.', a:'U', why:'Hay mucho volumen, pero algunos gastos son dudosos: la herramienta propone y el contador decide.'},
+  {id:'t3', t:'Aconsejar a un cliente si le conviene cambiar de régimen tributario.', a:'M', why:'Pocas veces, mucho criterio y responsabilidad profesional: la decisión es el trabajo mismo.'},
+  {id:'t4', t:'Renombrar una sola vez los archivos de un cliente que se mudó al estudio.', a:'C', why:'Es mecánico, pero ocurre una vez: armar una automatización puede costar más de lo que ahorra.'},
+  {id:'t5', t:'Mandar todos los meses el pedido de documentación a cada cliente.', a:'A', why:'Frecuente, siempre igual y basado en un calendario.'},
+  {id:'t6', t:'Revisar contratos de clientes buscando cláusulas fuera de lo habitual.', a:'U', why:'La herramienta puede marcar cláusulas raras, pero evaluarlas requiere criterio.'},
+  {id:'t7', t:'Definir el tratamiento contable de una operación atípica.', a:'M', why:'Es una decisión no estructurada: no hay procedimiento acordado.'},
+  {id:'t8', t:'Actualizar una vez al año una planilla que casi nadie consulta.', a:'C', why:'Poca frecuencia y poco valor: probablemente no valga la pena automatizarlo.'}
+];
+var HUNT = [
+  {t:'Sí, se puede. La herramienta más simple para esto es Zapier, porque reacciona a cada mail que llega.', err:false, why:'Correcto: Zapier reacciona a eventos, como un mail nuevo.'},
+  {t:'En el plan gratuito de Zapier podés armar Zaps de hasta cinco pasos, así que no vas a tener problemas.', err:true, why:'Falso: el plan gratuito permite Zaps de dos pasos (un trigger y una acción).'},
+  {t:'Como disparador, elegí Gmail → “New Invoice Detected”, que detecta solo las facturas.', err:true, why:'Ese trigger no existe. En la ayuda oficial figuran, por ejemplo, “New Email Matching Search” o “New Attachment”.'},
+  {t:'En la búsqueda poné subject:factura has:attachment, así toma solo mails con “factura” en el asunto y un adjunto.', err:false, why:'Correcto: son operadores de búsqueda de Gmail.'},
+  {t:'Como acción, elegí Google Sheets → “Create Spreadsheet Row” y asigná cada dato a su columna.', err:false, why:'Correcto: es una acción real de Google Sheets en Zapier.'},
+  {t:'Como seguramente tu estudio usa Google Workspace con cuenta corporativa, conectá esa cuenta directamente.', err:true, why:'Supuesto oculto: nadie le dijo qué cuenta usan. Además, conectar la cuenta del estudio sin autorización es un riesgo de acceso.'},
+  {t:'Para probarlo bien, pegame acá la última factura real de un cliente con su CUIT y la reviso.', err:true, why:'Riesgo de privacidad: nunca se pasan datos reales de clientes a una IA. Se prueba con datos ficticios.'},
+  {t:'Antes de activarlo, probá cada paso con el botón Test y revisá que la fila se haya creado bien.', err:false, why:'Correcto: probar antes de publicar es buena práctica.'}
+];
+var AGQ = [
+  {id:'g1', t:'Una empleada copia una factura en un chat de IA y le pregunta a qué cuenta va.', a:'G', why:'Una persona inicia la consulta y decide qué hacer con la respuesta: IA generativa como asistente.'},
+  {id:'g2', t:'Cada vez que llega una factura por mail, un sistema la lee, extrae importe y vencimiento y deja una propuesta de cuenta en la planilla.', a:'A', why:'Se activa solo, usa herramientas (mail, planilla) y encadena pasos: es un agente.'},
+  {id:'g3', t:'El socio le pide a una IA que le redacte un mail para un cliente.', a:'G', why:'La persona pide, la IA responde: asistente generativo.'},
+  {id:'g4', t:'Todos los lunes, un asistente revisa solo la casilla, detecta los vencimientos de la semana y prepara recordatorios para que el contador los apruebe.', a:'A', why:'Actúa por su cuenta dentro del proceso y deja el resultado para validar: agente.'}
+];
+var AGL = {G:'IA generativa (asistente)', A:'Agente de IA'};
+var RISKS_IA = [
+  {id:'seg', t:'Seguridad'}, {id:'priv', t:'Privacidad (Ley 25.326 y secreto profesional)'}, {id:'ses', t:'Sesgos'},
+  {id:'err', t:'Errores e invenciones'}, {id:'sup', t:'Supervisión humana'}
+];
+var MATCH = [
+  {id:'m1', r:'Accesos indebidos', c:'c1'}, {id:'m2', r:'Errores de procesamiento', c:'c2'}, {id:'m3', r:'Cambios no autorizados', c:'c3'},
+  {id:'m4', r:'Pérdida de información', c:'c4'}, {id:'m5', r:'Dependencia de sistemas', c:'c5'}, {id:'m6', r:'Fallas de integridad', c:'c6'}
+];
+var CTRLS = {
+  c3:'Solo un responsable puede modificar las reglas y cada cambio queda registrado.',
+  c5:'Hay un procedimiento manual de respaldo si la herramienta deja de funcionar.',
+  c1:'Cada persona entra con su propio usuario y solo con los permisos que necesita.',
+  c6:'Cada semana se compara la cantidad de mails recibidos con las filas registradas.',
+  c2:'Antes de usarla, se prueba con casos que deben pasar y casos que no.',
+  c4:'Se hace una copia de seguridad diaria de la planilla.'
+};
+var CLS = [
+  {id:'k1', t:'Copia de seguridad diaria de la planilla.', a:'G', why:'Rige todo el entorno de TI (seguridad de datos / operaciones): control general.'},
+  {id:'k2', t:'Solo se registran los mails que tienen un adjunto.', a:'E', why:'Filtra lo que entra al sistema: control de aplicación de entrada.'},
+  {id:'k3', t:'Cada empleado entra con su propio usuario y permisos.', a:'G', why:'Seguridad de acceso de todo el entorno: control general.'},
+  {id:'k4', t:'Al cierre de la semana se compara la cantidad de mails con las filas cargadas.', a:'P', why:'Verifica que el procesamiento haya sido completo: control de aplicación de procesamiento.'},
+  {id:'k5', t:'Una persona revisa la planilla y firma “Revisado por” antes de pagar.', a:'S', why:'Revisa el resultado antes de usarlo: control de aplicación de salida.'},
+  {id:'k6', t:'Solo el encargado de sistemas puede modificar la automatización.', a:'G', why:'Gestión de cambios / controles de implementación: control general.'}
+];
+var CLSL = {G:'General', E:'Aplicación · entrada', P:'Aplicación · procesamiento', S:'Aplicación · salida'};
+var TIPOS = ['General','Aplicación · entrada','Aplicación · procesamiento','Aplicación · salida'];
+var NIVEL = ['Alta','Media','Baja'];
+var BADGES = {
+  n1:'Clasificador', n2:'Detector de alucinaciones', n3:'Arquitecto de agentes', n4:'Auditor',
+  n5:'Constructor', n6:'Control de calidad', perfect_n1:'Matriz perfecta', perfect_hunt:'Ojo de auditor', perfect_match:'Controles a medida'
+};
+var SOCIO = {
+  n1:'Pierdo horas en tareas que hago siempre igual y algunas se me pasan. Antes de automatizar cualquier cosa, quiero ver si saben distinguir qué conviene automatizar y qué no.',
+  n2:'Me dijeron que le pregunte a una IA cómo hacerlo. Yo no le creo todo lo que dice. ¿Ustedes saben cuándo se equivoca?',
+  n3:'Si funciona, lo quiero en todo el estudio. Y además quiero que una IA lea cada factura apenas llega, saque el importe y el vencimiento y me proponga a qué cuenta va. Sola, sin que nadie tenga que subírsela.',
+  n4:'Antes de ponerlo en marcha, quiero saber qué puede salir mal y cómo lo vamos a controlar. Un auditor me lo va a preguntar.',
+  n5:'Bueno, basta de papel. Quiero verlo funcionando.',
+  n6:'Funciona. Ahora díganme la verdad: los controles que pensaron, ¿se pueden aplicar de verdad con esta herramienta?',
+  fin:'Excelente trabajo. Quiero el reporte completo para el archivo del estudio.'
+};
+
+/* ---------- Estado ---------- */
+function blank(){
+  return {v:1, created:new Date().toISOString(), team:{name:'',members:''}, done:{}, day1Saved:false,
+    n1:{game:{}, tarea:'', cuadrante:'', porque:'', impacto:'', complejidad:'', disp:'', cond:'', acc:'', ctrl:''},
+    n2:{prompt:'', checks:{}, hunt:{sel:{}, checked:false}, ia:'', respuesta:'', herramienta:'', herrPorque:'', bien:'', mal:'', supuso:'', noCompartieron:''},
+    n3:{quiz:{}, activa:'', lee:'', propone:'', deja:'', valida:'', alcance:'', duracion:'', exito:'', supervisa:'', estrategia:'', estrPorque:'', riesgos:{}},
+    n4:{match:{}, matchChecked:false, cls:{}, rows:[newRow(),newRow(),newRow(),newRow()]},
+    n5:{guiado:false, herramienta:'', descripcion:'', positiva:'', negativa:'', difIA:'', images:[]},
+    n6:{rev:[], registro:'', quienRevisa:'', noPrevisto:''}
+  };
+}
+function newRow(){return {riesgo:'',prob:'',imp:'',control:'',tipo:'',resp:'',agente:false};}
+var S = load() || blank();
+var current = null;
+var memOnlyImages = false;
+
+function load(){
+  try{ var raw = localStorage.getItem(KEY); if(!raw) return null; var o = JSON.parse(raw); return (o && o.v===1) ? merge(blank(), o) : null; }catch(e){ return null; }
+}
+function merge(base, o){
+  for(var k in o){ if(o[k] && typeof o[k]==='object' && !Array.isArray(o[k]) && base[k] && typeof base[k]==='object' && !Array.isArray(base[k])) base[k]=merge(base[k], o[k]); else base[k]=o[k]; }
+  return base;
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); memOnlyImages=false; }
+  catch(e){
+    try{ var c = JSON.parse(JSON.stringify(S)); c.n5.images = []; localStorage.setItem(KEY, JSON.stringify(c)); memOnlyImages = S.n5.images.length>0; }catch(e2){}
+  }
+}
+function get(path){ return path.split('.').reduce(function(o,k){return o==null?undefined:o[k];}, S); }
+function set(path, val){
+  var ks = path.split('.'), o = S;
+  for(var i=0;i<ks.length-1;i++){ if(o[ks[i]]==null) o[ks[i]] = {}; o = o[ks[i]]; }
+  o[ks[ks.length-1]] = val; save();
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function filled(v){ return String(v||'').trim().length >= 3; }
+
+/* ---------- Puntos e insignias ---------- */
+function n1Correct(){ return N1_TASKS.filter(function(t){return S.n1.game[t.id]===t.a;}).length; }
+function huntScore(){
+  if(!S.n2.hunt.checked) return 0;
+  var p=0; HUNT.forEach(function(h,i){ var sel=!!S.n2.hunt.sel[i]; if(sel&&h.err) p+=15; if(sel&&!h.err) p-=5; });
+  return Math.max(0,p);
+}
+function huntPerfect(){ return S.n2.hunt.checked && HUNT.every(function(h,i){return !!S.n2.hunt.sel[i]===h.err;}); }
+function agCorrect(){ return AGQ.filter(function(q){return S.n3.quiz[q.id]===q.a;}).length; }
+function matchCorrect(){ return S.n4.matchChecked ? MATCH.filter(function(m){return S.n4.match[m.id]===m.c;}).length : 0; }
+function clsCorrect(){ return CLS.filter(function(q){return S.n4.cls[q.id]===q.a;}).length; }
+function points(){
+  var p = n1Correct()*10 + huntScore() + agCorrect()*10 + matchCorrect()*10 + clsCorrect()*10;
+  LEVELS.forEach(function(l){ if(S.done[l.id] && l.id!=='fin') p+=50; });
+  return p;
+}
+function badges(){
+  var b=[]; ['n1','n2','n3','n4','n5','n6'].forEach(function(k){ if(S.done[k]) b.push(BADGES[k]); });
+  if(N1_TASKS.every(function(t){return S.n1.game[t.id];}) && n1Correct()===N1_TASKS.length) b.push(BADGES.perfect_n1);
+  if(huntPerfect()) b.push(BADGES.perfect_hunt);
+  if(S.n4.matchChecked && matchCorrect()===MATCH.length) b.push(BADGES.perfect_match);
+  return b;
+}
+
+/* ---------- Navegación ---------- */
+function unlocked(id){
+  var i = LEVELS.findIndex(function(l){return l.id===id;});
+  for(var j=0;j<i;j++){ if(!S.done[LEVELS[j].id]) return false; }
+  return !!S.team.name;
+}
+function renderNav(){
+  var h='', lastDay=0;
+  LEVELS.forEach(function(l,i){
+    if(l.day!==lastDay){ h+='<div class="day">// DÍA '+l.day+'</div>'; lastDay=l.day; }
+    var cls='lv'+(S.done[l.id]?' done':'')+(unlocked(l.id)?'':' locked')+(current===l.id?' active':'');
+    h+='<button type="button" class="'+cls+'" data-go="'+l.id+'"'+(unlocked(l.id)?'':' disabled')+'><span class="n">'+(l.id==='fin'?'★':(i+1))+'</span>'+esc(l.t)+(S.done[l.id]?' ✓':'')+'</button>';
+  });
+  document.getElementById('nav').innerHTML = h;
+  document.getElementById('pTeam').textContent = 'Equipo: ' + (S.team.name || '—');
+  document.getElementById('pPoints').textContent = points();
+}
+function go(id){ current=id; render(); window.scrollTo(0,0); }
+function firstOpen(){ for(var i=0;i<LEVELS.length;i++){ if(!S.done[LEVELS[i].id]) return LEVELS[i].id; } return 'fin'; }
+
+/* ---------- Componentes ---------- */
+function socio(id){ return '<div class="socio"><div class="av">CR</div><div><div class="who">MENSAJE DEL CDOR. RIVADAVIA</div><p>«'+esc(SOCIO[id])+'»</p></div></div>'; }
+function tf(path,label,ph,area){
+  var v = esc(get(path)||'');
+  return '<label class="f" for="'+path+'">'+label+'</label>'+(area?'<textarea id="'+path+'" data-k="'+path+'" placeholder="'+esc(ph||'')+'">'+v+'</textarea>':'<input type="text" id="'+path+'" data-k="'+path+'" value="'+v+'" placeholder="'+esc(ph||'')+'">');
+}
+function sel(path,label,opts){
+  var v=get(path)||''; var h='<label class="f" for="'+path+'">'+label+'</label><select id="'+path+'" data-k="'+path+'"><option value="">Elegir…</option>';
+  opts.forEach(function(o){ h+='<option'+(o===v?' selected':'')+'>'+esc(o)+'</option>'; }); return h+'</select>';
+}
+function completeBox(id){
+  return '<div class="actions"><button class="btn" type="button" data-complete="'+id+'">'+(S.done[id]?'Nivel completado ✓ · Guardar cambios':'Completar nivel')+'</button><span class="hint">Se guarda solo en este navegador mientras trabajan.</span></div><div id="miss-'+id+'"></div>';
+}
+function header(id, n, title, day){
+  return '<div class="kicker">// DÍA '+day+' · NIVEL '+n+'</div><h1>'+esc(title)+'</h1>'+socio(id);
+}
+
+/* ---------- Pantallas ---------- */
+function vWelcome(){
+  return '<div class="kicker">// ACTIVIDAD INTEGRADORA · UNIDADES 3, 8 Y 9</div><h1>Misión: el pedido del socio</h1>'+socio('n1')+
+  '<div class="card"><h2>Cómo se juega</h2><ol class="welcome-steps">'+
+  '<li>Trabajan en grupo, con <b>un solo dispositivo</b> por grupo.</li>'+
+  '<li>Hay seis niveles: cuatro el Día 1 y dos el Día 2. Cada nivel se destraba al completar el anterior.</li>'+
+  '<li>Los minijuegos dan puntos e insignias. Las respuestas de diseño no tienen puntaje: tienen que estar completas.</li>'+
+  '<li><b>Al final del Día 1 guarden la partida</b>: copien el código y descarguen el archivo. El Día 2 lo cargan y siguen.</li>'+
+  '<li>Al terminar, la página arma el <b>reporte de misión</b> en PDF para entregar.</li></ol>'+
+  '<p class="hint">Usen siempre datos ficticios. Nada de lo que escriban sale de este navegador.</p></div>'+
+  '<div class="card tint"><h2>Nuevo equipo</h2>'+tf('team.name','Nombre del equipo','Ej.: Los Conciliadores')+tf('team.members','Integrantes','Nombre y apellido de cada integrante',true)+
+  '<div class="actions"><button class="btn" type="button" id="bStart">Empezar la misión</button><button class="btn sec" type="button" data-open-save="1">Ya tenemos una partida: cargarla</button></div><div id="miss-start"></div></div>';
+}
+
+function vN1(){
+  var h = header('n1',1,'Clasificar',1);
+  h += '<div class="card"><h2>Minijuego · ¿Qué hacemos con cada tarea?</h2><p class="hint">Elijan una opción por tarea. Hay una sola oportunidad: 10 puntos por acierto.</p>';
+  N1_TASKS.forEach(function(t){
+    var ans=S.n1.game[t.id];
+    h+='<div class="task"><b>'+esc(t.t)+'</b><div class="opts">';
+    Object.keys(Q).forEach(function(k){
+      var c='opt'; if(ans){ if(k===t.a) c+=' ok'; else if(k===ans) c+=' bad'; }
+      h+='<button type="button" class="'+c+'" data-n1="'+t.id+'" data-v="'+k+'"'+(ans?' disabled':'')+'>'+esc(Q[k])+'</button>';
+    });
+    h+='</div>'+(ans?'<div class="fb '+(ans===t.a?'ok':'bad')+'">'+(ans===t.a?'¡Bien! ':'Era “'+esc(Q[t.a])+'”. ')+esc(t.why)+'</div>':'')+'</div>';
+  });
+  h+='</div><div class="card"><h2>Su tarea: el pedido del socio</h2><p class="hint">Elijan una tarea repetitiva propia (personal o del trabajo de alguien del grupo).</p>'+
+  '<details><summary>¿No se les ocurre ninguna? Plan B</summary><ul><li>Pedido mensual de documentación a clientes</li><li>Recordatorio de vencimientos</li><li>Guardar adjuntos de clientes en carpetas</li><li>Registro de facturas recibidas</li><li>Comparar comprobantes de ARCA con el libro de compras</li></ul></details>'+
+  tf('n1.tarea','Tarea elegida','Describan la tarea en una o dos frases',true)+
+  '<div class="grid3"><div>'+sel('n1.cuadrante','Cuadrante de la matriz',[Q.A,Q.U,Q.M,Q.C])+'</div><div>'+sel('n1.impacto','Impacto (1 a 3)',['1','2','3'])+'</div><div>'+sel('n1.complejidad','Complejidad (1 a 3)',['1','2','3'])+'</div></div>'+
+  tf('n1.porque','¿Por qué la eligieron?','',true)+
+  '<h3>Anatomía en cuatro piezas</h3><div class="grid2"><div>'+tf('n1.disp','Disparador <small>qué la pone en marcha</small>','',true)+'</div><div>'+tf('n1.cond','Condición <small>qué tiene que cumplirse</small>','',true)+'</div><div>'+tf('n1.acc','Acción <small>qué hace la herramienta</small>','',true)+'</div><div>'+tf('n1.ctrl','Control humano <small>dónde revisa una persona</small>','',true)+'</div></div>'+
+  completeBox('n1')+'</div>';
+  return h;
+}
+function req_n1(){
+  var m=[]; if(Object.keys(S.n1.game).length<N1_TASKS.length) m.push('Jugar las 8 tareas del minijuego.');
+  ['tarea','porque','disp','cond','acc','ctrl'].forEach(function(k){ if(!filled(S.n1[k])) m.push('Completar: '+({tarea:'tarea elegida',porque:'por qué la eligieron',disp:'disparador',cond:'condición',acc:'acción',ctrl:'control humano'})[k]+'.'); });
+  ['cuadrante','impacto','complejidad'].forEach(function(k){ if(!S.n1[k]) m.push('Elegir: '+k+'.'); });
+  return m;
+}
+
+function vN2(){
+  var h = header('n2',2,'Interrogar a la IA',1);
+  h+='<div class="card"><h2>Minijuego · Cazá el error</h2><p class="hint">Un estudiante le preguntó a una IA cómo automatizar el registro de facturas. Hagan clic en las frases que están <b>mal</b> (datos falsos, supuestos ocultos o riesgos). Después, “Verificar”. +15 por error encontrado, −5 por frase correcta marcada.</p><div class="aibox"><div class="tag">RESPUESTA DE LA IA</div>';
+  HUNT.forEach(function(x,i){
+    var c='sentence'; var s=!!S.n2.hunt.sel[i];
+    if(S.n2.hunt.checked){ c += x.err ? (s?' hit':' miss') : (s?' fp':''); } else if(s) c+=' sel';
+    h+='<span class="'+c+'" data-hunt="'+i+'" role="button" tabindex="0">'+esc(x.t)+(S.n2.hunt.checked&&(x.err||s)?'<br><small><b>'+(x.err?'Error: ':'Esta estaba bien: ')+'</b>'+esc(x.why)+'</small>':'')+'</span>';
+  });
+  h+='</div><div class="actions">'+(S.n2.hunt.checked?'<b>Puntaje del minijuego: '+huntScore()+'</b>':'<button class="btn dark" type="button" id="bHunt">Verificar</button>')+'</div></div>';
+  h+='<div class="card"><h2>Su consulta a la IA</h2><p class="hint">Usen la IA que prefieran. Recuerden: datos ficticios.</p>'+tf('n2.prompt','Prompt (texto completo)','Contexto, tarea, restricciones y formato',true)+
+  '<div class="checks"><b>Checklist del prompt</b>';
+  [['ctx','Dice quiénes son y dónde trabajan (contexto).'],['tar','Explica qué quieren lograr, con un ejemplo (tarea).'],['res','Indica herramientas disponibles, plan y qué datos no comparten (restricciones).'],['her','Pregunta qué herramienta conviene y por qué.'],['fmt','Pide pasos numerados y que aclare sus supuestos (formato).']].forEach(function(c){
+    h+='<label><input type="checkbox" data-chk="n2.checks.'+c[0]+'"'+(S.n2.checks[c[0]]?' checked':'')+'> '+esc(c[1])+'</label>';
+  });
+  h+='</div><div class="grid2"><div>'+tf('n2.ia','IA utilizada','Claude, ChatGPT, Copilot…')+'</div><div>'+sel('n2.herramienta','Herramienta elegida',['Zapier','Power Query','Excel','Otra'])+'</div></div>'+
+  tf('n2.respuesta','Respuesta de la IA (resumen de lo central)','',true)+tf('n2.herrPorque','¿Por qué esa herramienta?','',true)+
+  '<h3>Nota de verificación <small class="hint">contrasten con help.zapier.com o la ayuda de Microsoft</small></h3>'+tf('n2.bien','Qué estaba bien','',true)+tf('n2.mal','Qué estaba mal o no existe','',true)+tf('n2.supuso','Qué supuso la IA sin decirlo','',true)+tf('n2.noCompartieron','Qué datos decidieron no compartir y por qué','',true)+
+  completeBox('n2')+'</div>';
+  return h;
+}
+function req_n2(){
+  var m=[]; if(!S.n2.hunt.checked) m.push('Jugar y verificar “Cazá el error”.');
+  if(Object.keys(S.n2.checks).filter(function(k){return S.n2.checks[k];}).length<5) m.push('Tildar los 5 puntos del checklist del prompt (y que el prompt los cumpla).');
+  var L={prompt:'prompt',ia:'IA utilizada',respuesta:'respuesta de la IA',herrPorque:'por qué esa herramienta',bien:'qué estaba bien',mal:'qué estaba mal',supuso:'qué supuso',noCompartieron:'datos que no compartieron'};
+  Object.keys(L).forEach(function(k){ if(!filled(S.n2[k])) m.push('Completar: '+L[k]+'.'); });
+  if(!S.n2.herramienta) m.push('Elegir la herramienta.');
+  return m;
+}
+
+function vN3(){
+  var h = header('n3',3,'El agente',1);
+  h+='<div class="card"><h2>Minijuego · ¿Asistente o agente?</h2><p class="hint">Una oportunidad por caso: 10 puntos por acierto.</p>';
+  AGQ.forEach(function(q){
+    var ans=S.n3.quiz[q.id]; h+='<div class="task"><b>'+esc(q.t)+'</b><div class="opts">';
+    Object.keys(AGL).forEach(function(k){ var c='opt'; if(ans){ if(k===q.a) c+=' ok'; else if(k===ans) c+=' bad'; } h+='<button type="button" class="'+c+'" data-ag="'+q.id+'" data-v="'+k+'"'+(ans?' disabled':'')+'>'+esc(AGL[k])+'</button>'; });
+    h+='</div>'+(ans?'<div class="fb '+(ans===q.a?'ok':'bad')+'">'+esc(q.why)+'</div>':'')+'</div>';
+  });
+  h+='</div><div class="card"><h2>Diseño del agente</h2><p class="hint">No lo construyen: lo diseñan. Si su tarea no trabaja con facturas, adapten el pedido: el agente lee el documento o el dato que maneja su tarea y propone algo que una persona valida.</p><div class="grid2"><div>'+
+  tf('n3.activa','¿Qué lo activa?','',true)+'</div><div>'+tf('n3.lee','¿Qué lee?','',true)+'</div><div>'+tf('n3.propone','¿Qué extrae o propone?','',true)+'</div><div>'+tf('n3.deja','¿Dónde deja el resultado?','',true)+'</div></div>'+tf('n3.valida','¿Quién lo valida y cómo?','',true)+
+  '<h3>Riesgos de IA que aplican <small class="hint">marquen al menos dos y expliquen</small></h3>';
+  RISKS_IA.forEach(function(r){
+    var on = S.n3.riesgos[r.id] && S.n3.riesgos[r.id].on;
+    h+='<div class="task"><label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" data-chk="n3.riesgos.'+r.id+'.on"'+(on?' checked':'')+'> <b>'+esc(r.t)+'</b></label>'+(on?tf('n3.riesgos.'+r.id+'.why','¿Por qué aplica en este caso?','',true):'')+'</div>';
+  });
+  h+='<h3>Piloto del agente</h3><div class="grid2"><div>'+tf('n3.alcance','Alcance <small>quiénes, qué casos</small>','',true)+'</div><div>'+tf('n3.duracion','Duración','')+'</div></div>'+
+  tf('n3.exito','Medida de éxito definida de antemano','Ej.: el agente acierta la cuenta en el 95 % de los casos frente a la revisión humana',true)+tf('n3.supervisa','¿Quién lo supervisa?','')+
+  sel('n3.estrategia','Estrategia de conversión (Laudon, cap. 13)',['Paralela','Reemplazo directo','Estudio piloto','Por fases'])+tf('n3.estrPorque','¿Por qué esa estrategia?','',true)+
+  completeBox('n3')+'</div>';
+  return h;
+}
+function req_n3(){
+  var m=[]; if(Object.keys(S.n3.quiz).length<AGQ.length) m.push('Jugar los 4 casos de “¿Asistente o agente?”.');
+  var L={activa:'qué lo activa',lee:'qué lee',propone:'qué propone',deja:'dónde deja el resultado',valida:'quién valida',alcance:'alcance',duracion:'duración',exito:'medida de éxito',supervisa:'quién supervisa',estrPorque:'por qué esa estrategia'};
+  Object.keys(L).forEach(function(k){ if(!filled(S.n3[k])) m.push('Completar: '+L[k]+'.'); });
+  if(!S.n3.estrategia) m.push('Elegir la estrategia de conversión.');
+  var rs = RISKS_IA.filter(function(r){return S.n3.riesgos[r.id]&&S.n3.riesgos[r.id].on;});
+  if(rs.length<2) m.push('Marcar al menos dos riesgos de IA.');
+  rs.forEach(function(r){ if(!filled(S.n3.riesgos[r.id].why)) m.push('Explicar por qué aplica: '+r.t+'.'); });
+  return m;
+}
+
+function vN4(){
+  var h = header('n4',4,'Riesgos y controles',1);
+  h+='<div class="card"><h2>Minijuego 1 · Cada riesgo con su control</h2><p class="hint">Elijan el control para cada riesgo y después “Verificar”. 10 puntos por acierto.</p>';
+  var ck=S.n4.matchChecked;
+  MATCH.forEach(function(m){
+    var v=S.n4.match[m.id]||''; var ok = ck && v===m.c;
+    h+='<div class="task"><b>'+esc(m.r)+'</b><select data-k="n4.match.'+m.id+'"'+(ck?' disabled':'')+'><option value="">Elegir control…</option>';
+    Object.keys(CTRLS).forEach(function(c){ h+='<option value="'+c+'"'+(c===v?' selected':'')+'>'+esc(CTRLS[c])+'</option>'; });
+    h+='</select>'+(ck?'<div class="fb '+(ok?'ok':'bad')+'">'+(ok?'¡Bien!':'El control adecuado era: '+esc(CTRLS[m.c]))+'</div>':'')+'</div>';
+  });
+  h+='<div class="actions">'+(ck?'<b>Aciertos: '+matchCorrect()+' de '+MATCH.length+'</b>':'<button class="btn dark" type="button" id="bMatch">Verificar</button>')+'</div></div>';
+  h+='<div class="card"><h2>Minijuego 2 · ¿General o de aplicación?</h2><p class="hint">Una oportunidad por control: 10 puntos por acierto.</p>';
+  CLS.forEach(function(q){
+    var ans=S.n4.cls[q.id]; h+='<div class="task"><b>'+esc(q.t)+'</b><div class="opts">';
+    Object.keys(CLSL).forEach(function(k){ var c='opt'; if(ans){ if(k===q.a) c+=' ok'; else if(k===ans) c+=' bad'; } h+='<button type="button" class="'+c+'" data-cls="'+q.id+'" data-v="'+k+'"'+(ans?' disabled':'')+'>'+esc(CLSL[k])+'</button>'; });
+    h+='</div>'+(ans?'<div class="fb '+(ans===q.a?'ok':'bad')+'">'+esc(q.why)+'</div>':'')+'</div>';
+  });
+  h+='</div><div class="card"><h2>Su matriz de riesgos y controles</h2><p class="hint">Para la automatización ya escalada al estudio, incluido el agente. Requisitos: al menos 4 riesgos, un control general, uno de aplicación, dos riesgos del agente y un responsable con rol (no “el estudio”).</p><div class="tablewrap"><table class="mx"><thead><tr><th>Riesgo</th><th>Prob.</th><th>Impacto</th><th>Control propuesto</th><th>Tipo</th><th>Responsable (rol)</th><th>¿Agente?</th><th></th></tr></thead><tbody>';
+  S.n4.rows.forEach(function(r,i){
+    var p='n4.rows.'+i+'.';
+    function s2(k,opts){ var v=r[k]||''; var x='<select data-k="'+p+k+'"><option value=""></option>'; opts.forEach(function(o){x+='<option'+(o===v?' selected':'')+'>'+o+'</option>';}); return x+'</select>'; }
+    h+='<tr><td><input type="text" data-k="'+p+'riesgo" value="'+esc(r.riesgo)+'"></td><td>'+s2('prob',NIVEL)+'</td><td>'+s2('imp',NIVEL)+'</td><td><input type="text" data-k="'+p+'control" value="'+esc(r.control)+'"></td><td>'+s2('tipo',TIPOS)+'</td><td><input type="text" data-k="'+p+'resp" value="'+esc(r.resp)+'"></td><td style="text-align:center"><input type="checkbox" data-chk="'+p+'agente"'+(r.agente?' checked':'')+'></td><td>'+(S.n4.rows.length>4?'<button type="button" class="btn small sec" data-delrow="'+i+'" aria-label="Quitar fila">×</button>':'')+'</td></tr>';
+  });
+  h+='</tbody></table></div><div class="actions"><button type="button" class="btn small sec" id="bAddRow">+ Agregar riesgo</button></div>'+completeBox('n4')+'</div>';
+  return h;
+}
+function req_n4(){
+  var m=[]; if(!S.n4.matchChecked) m.push('Jugar y verificar el minijuego 1.');
+  if(Object.keys(S.n4.cls).length<CLS.length) m.push('Jugar los 6 controles del minijuego 2.');
+  var rows=S.n4.rows.filter(function(r){return filled(r.riesgo)&&filled(r.control)&&r.prob&&r.imp&&r.tipo&&filled(r.resp);});
+  if(rows.length<4) m.push('Completar al menos 4 filas de la matriz (todas las columnas).');
+  if(!rows.some(function(r){return r.tipo==='General';})) m.push('Incluir al menos un control general.');
+  if(!rows.some(function(r){return r.tipo.indexOf('Aplicación')===0;})) m.push('Incluir al menos un control de aplicación.');
+  if(rows.filter(function(r){return r.agente;}).length<2) m.push('Marcar al menos dos riesgos del agente.');
+  if(rows.some(function(r){return /^\s*(el\s+)?estudio\s*$/i.test(r.resp);})) m.push('“El estudio” no es un responsable: indiquen un rol.');
+  return m;
+}
+
+function vDay2Gate(){
+  return '<div class="card tint"><h2>Fin del Día 1</h2><p>Antes de cerrar, <b>guarden la partida</b>: copien el código y descarguen el archivo. El Día 2 lo cargan con el botón “Guardar / cargar partida”.</p><div class="actions"><button class="btn" type="button" data-open-save="1">Guardar la partida ahora</button></div></div>';
+}
+
+function vN5(){
+  var h = header('n5',5,'Construir',2);
+  h+='<div class="card"><h2>Prototipo</h2><p class="hint">Cada integrante hace el ejemplo guiado de Zapier (Partes 1 a 5 del instructivo). Después el grupo arma su propia automatización en la herramienta que eligieron.</p>'+
+  '<div class="checks"><label><input type="checkbox" data-chk="n5.guiado"'+(S.n5.guiado?' checked':'')+'> Todos hicimos el ejemplo guiado de Zapier.</label></div>'+
+  sel('n5.herramienta','Herramienta usada para su automatización',['Zapier','Power Query','Excel','Otra'])+
+  tf('n5.descripcion','¿Qué armaron?','Disparador, condición y acción tal como quedaron en la herramienta',true)+
+  '<div class="grid2"><div>'+tf('n5.positiva','Prueba positiva: qué probaron y qué pasó','',true)+'</div><div>'+tf('n5.negativa','Prueba negativa: qué probaron y qué pasó','',true)+'</div></div>'+
+  tf('n5.difIA','Diferencias con lo que propuso la IA','',true)+
+  '<h3>Capturas</h3><p class="hint">Suban al menos una captura de la automatización armada y, si pueden, otra del resultado o del registro (Zap history o pasos aplicados). Las imágenes quedan solo en este navegador.</p>'+
+  '<input type="file" id="fImg" accept="image/*" multiple><div class="thumbs">';
+  S.n5.images.forEach(function(im,i){ h+='<figure><img src="'+im.data+'" alt="Captura '+(i+1)+'"><figcaption><span>'+esc(im.name)+'</span><button type="button" class="btn small sec" data-delimg="'+i+'">Quitar</button></figcaption></figure>'; });
+  h+='</div>'+(memOnlyImages?'<div class="missing">El navegador no tiene espacio para guardar las capturas. No recarguen la página hasta generar el reporte.</div>':'')+completeBox('n5')+'</div>';
+  return h;
+}
+function req_n5(){
+  var m=[]; if(!S.n5.guiado) m.push('Confirmar que hicieron el ejemplo guiado.');
+  if(!S.n5.herramienta) m.push('Elegir la herramienta usada.');
+  var L={descripcion:'qué armaron',positiva:'prueba positiva',negativa:'prueba negativa',difIA:'diferencias con la IA'};
+  Object.keys(L).forEach(function(k){ if(!filled(S.n5[k])) m.push('Completar: '+L[k]+'.'); });
+  if(!S.n5.images.length) m.push('Subir al menos una captura.');
+  return m;
+}
+
+function vN6(){
+  var h = header('n6',6,'¿Resistió?',2);
+  h+='<div class="card"><h2>La matriz frente al prototipo</h2><p class="hint">Para cada control que pensaron el Día 1: ¿se pudo aplicar con la herramienta? ¿Depende de la herramienta o de una persona?</p><div class="tablewrap"><table class="mx"><thead><tr><th>Riesgo</th><th>Control</th><th>¿Se pudo aplicar?</th><th>Depende de</th><th>Comentario</th></tr></thead><tbody>';
+  S.n4.rows.forEach(function(r,i){
+    if(!filled(r.riesgo)) return;
+    var rv=S.n6.rev[i]||{}; var p='n6.rev.'+i+'.';
+    function s2(k,opts){ var v=rv[k]||''; var x='<select data-k="'+p+k+'"><option value=""></option>'; opts.forEach(function(o){x+='<option'+(o===v?' selected':'')+'>'+o+'</option>';}); return x+'</select>'; }
+    h+='<tr><td>'+esc(r.riesgo)+'</td><td>'+esc(r.control)+'</td><td>'+s2('aplicado',['Sí','En parte','No'])+'</td><td>'+s2('depende',['La herramienta','Una persona','Ambas'])+'</td><td><input type="text" data-k="'+p+'coment" value="'+esc(rv.coment||'')+'"></td></tr>';
+  });
+  h+='</tbody></table></div>'+tf('n6.registro','¿Qué registro deja la herramienta?','Zap history, pasos aplicados de Power Query…',true)+tf('n6.quienRevisa','¿Quién revisaría ese registro y cada cuánto?','')+tf('n6.noPrevisto','Un riesgo que no habían previsto y apareció al construir','',true)+completeBox('n6')+'</div>';
+  return h;
+}
+function req_n6(){
+  var m=[]; var any=false;
+  S.n4.rows.forEach(function(r,i){ if(!filled(r.riesgo)) return; any=true; var rv=S.n6.rev[i]||{}; if(!rv.aplicado||!rv.depende) m.push('Completar la revisión del riesgo: '+r.riesgo+'.'); });
+  if(!any) m.push('No hay riesgos cargados en el Nivel 4.');
+  if(!filled(S.n6.registro)) m.push('Completar: qué registro deja la herramienta.');
+  if(!filled(S.n6.quienRevisa)) m.push('Completar: quién lo revisaría.');
+  if(!filled(S.n6.noPrevisto)) m.push('Completar: riesgo no previsto.');
+  return m;
+}
+
+function vFin(){
+  var b=badges();
+  var h='<div class="kicker">// DÍA 2 · FINAL</div><h1>Reporte de misión</h1>'+socio('fin')+
+  '<div class="card dark"><h2 style="color:#fff">'+esc(S.team.name)+' · '+points()+' puntos</h2><div class="badges">'+b.map(function(x){return '<span class="badge"><span class="dot"></span>'+esc(x)+'</span>';}).join('')+'</div></div>'+
+  '<div class="card"><h2>Generar el PDF</h2><ol class="welcome-steps"><li>Hagan clic en “Guardar reporte como PDF”.</li><li>En la ventana de impresión, elijan <b>Guardar como PDF</b> como destino.</li><li>Suban el PDF donde indique la docente.</li></ol>'+
+  '<div class="actions"><button class="btn" type="button" id="bPrint">Guardar reporte como PDF</button><button class="btn sec" type="button" id="bPreview">Ver el reporte</button></div></div><div id="previewBox"></div>';
+  return h;
+}
+
+var REQ = {n1:req_n1, n2:req_n2, n3:req_n3, n4:req_n4, n5:req_n5, n6:req_n6};
+var VIEW = {n1:vN1, n2:vN2, n3:vN3, n4:vN4, n5:vN5, n6:vN6, fin:vFin};
+
+function render(){
+  if(!S.team.name || !current){ current = S.team.name ? firstOpen() : null; }
+  renderNav();
+  var app=document.getElementById('app');
+  if(!current){ app.innerHTML=vWelcome(); return; }
+  var h = VIEW[current]();
+  if(current==='n4' && S.done.n4 && !S.day1Saved) h += vDay2Gate();
+  app.innerHTML = h;
+}
+
+/* ---------- Reporte ---------- */
+function dl(pairs){ return '<dl>'+pairs.map(function(p){return '<dt>'+esc(p[0])+'</dt><dd>'+esc(p[1]||'—')+'</dd>';}).join('')+'</dl>'; }
+function buildReport(){
+  var r='<h1>Reporte de misión · El pedido del socio</h1><p class="meta">Gestión de IT · UADE · Estudio Contable Rivadavia &amp; Asociados · Generado el '+esc(new Date().toLocaleString('es-AR'))+'</p>';
+  r+=dl([['Equipo',S.team.name],['Integrantes',S.team.members],['Puntos',String(points())],['Insignias',badges().join(' · ')]]);
+  r+='<h2>1 · La tarea</h2>'+dl([['Tarea',S.n1.tarea],['Cuadrante',S.n1.cuadrante],['Impacto / complejidad',(S.n1.impacto||'—')+' / '+(S.n1.complejidad||'—')],['Por qué',S.n1.porque],['Disparador',S.n1.disp],['Condición',S.n1.cond],['Acción',S.n1.acc],['Control humano',S.n1.ctrl],['Minijuego de la matriz',n1Correct()+' de '+N1_TASKS.length+' aciertos']]);
+  r+='<h2>2 · Consulta a la IA y verificación</h2>'+dl([['IA utilizada',S.n2.ia],['Prompt',S.n2.prompt],['Respuesta (resumen)',S.n2.respuesta],['Herramienta elegida',S.n2.herramienta],['Por qué',S.n2.herrPorque],['Qué estaba bien',S.n2.bien],['Qué estaba mal',S.n2.mal],['Qué supuso',S.n2.supuso],['Datos no compartidos',S.n2.noCompartieron],['“Cazá el error”',huntScore()+' puntos']]);
+  var rs=RISKS_IA.filter(function(x){return S.n3.riesgos[x.id]&&S.n3.riesgos[x.id].on;}).map(function(x){return x.t+': '+(S.n3.riesgos[x.id].why||'');}).join('\n');
+  r+='<h2>3 · El agente y su piloto</h2>'+dl([['Lo activa',S.n3.activa],['Lee',S.n3.lee],['Propone',S.n3.propone],['Deja el resultado en',S.n3.deja],['Valida',S.n3.valida],['Riesgos de IA',rs],['Alcance del piloto',S.n3.alcance],['Duración',S.n3.duracion],['Medida de éxito',S.n3.exito],['Supervisa',S.n3.supervisa],['Estrategia de conversión',(S.n3.estrategia||'—')+(S.n3.estrPorque?': '+S.n3.estrPorque:'')]]);
+  r+='<h2>4 · Matriz de riesgos y controles</h2><table><thead><tr><th>Riesgo</th><th>Prob.</th><th>Imp.</th><th>Control</th><th>Tipo</th><th>Responsable</th><th>Agente</th><th>¿Se aplicó?</th><th>Depende de</th></tr></thead><tbody>';
+  S.n4.rows.forEach(function(x,i){ if(!filled(x.riesgo)) return; var rv=S.n6.rev[i]||{}; r+='<tr><td>'+esc(x.riesgo)+'</td><td>'+esc(x.prob)+'</td><td>'+esc(x.imp)+'</td><td>'+esc(x.control)+'</td><td>'+esc(x.tipo)+'</td><td>'+esc(x.resp)+'</td><td>'+(x.agente?'Sí':'')+'</td><td>'+esc(rv.aplicado||'')+(rv.coment?' · '+esc(rv.coment):'')+'</td><td>'+esc(rv.depende||'')+'</td></tr>'; });
+  r+='</tbody></table>';
+  r+='<h2>5 · Prototipo</h2>'+dl([['Herramienta',S.n5.herramienta],['Qué armaron',S.n5.descripcion],['Prueba positiva',S.n5.positiva],['Prueba negativa',S.n5.negativa],['Diferencias con la IA',S.n5.difIA]]);
+  S.n5.images.forEach(function(im,i){ r+='<figure><img src="'+im.data+'" alt="Captura '+(i+1)+'"><figcaption class="meta">Captura '+(i+1)+' · '+esc(im.name)+'</figcaption></figure>'; });
+  r+='<h2>6 · ¿Resistió?</h2>'+dl([['Registro que deja la herramienta',S.n6.registro],['Quién lo revisa',S.n6.quienRevisa],['Riesgo no previsto',S.n6.noPrevisto]]);
+  return r;
+}
+
+/* ---------- Guardar / cargar partida ---------- */
+function toCode(){
+  var c=JSON.parse(JSON.stringify(S)); c.n5.images=[];
+  var bytes=new TextEncoder().encode(JSON.stringify(c)); var bin=''; for(var i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]);
+  return 'MISION1:'+btoa(bin);
+}
+function fromCode(code){
+  code=String(code||'').trim(); if(code.indexOf('MISION1:')!==0) throw new Error('El código no es de esta misión.');
+  var bin=atob(code.slice(8)); var bytes=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  var o=JSON.parse(new TextDecoder().decode(bytes)); if(!o||o.v!==1) throw new Error('Versión no reconocida.'); return o;
+}
+function applyLoaded(o){
+  var imgs=S.n5.images; S=merge(blank(), o); if(!S.n5.images.length && imgs.length) S.n5.images=imgs;
+  save(); current=null; closeModal(); render(); toast('Partida cargada. ¡A seguir!');
+}
+function openSave(){
+  var code=''; try{ code = S.team.name ? toCode() : ''; }catch(e){}
+  var bg=document.createElement('div'); bg.className='modal-bg'; bg.id='modal';
+  bg.innerHTML='<div class="modal" role="dialog" aria-modal="true" aria-label="Guardar o cargar partida"><h2>Guardar / cargar partida</h2>'+
+  (code?'<h3>Guardar</h3><p class="hint">Copien este código y guárdenlo (mándenselo por mail o péguenlo en Teams). También pueden descargar el archivo. Las capturas no viajan en el código.</p><textarea class="codebox" id="codeOut" readonly>'+esc(code)+'</textarea><div class="actions"><button class="btn" type="button" id="bCopy">Copiar código</button><button class="btn sec" type="button" id="bDl">Descargar archivo</button></div>':'<p class="hint">Todavía no hay partida para guardar.</p>')+
+  '<h3>Cargar una partida</h3><p class="hint">Peguen el código o elijan el archivo que descargaron. Reemplaza lo que haya en este navegador.</p><textarea class="codebox" id="codeIn" placeholder="MISION1:…"></textarea><div class="actions"><button class="btn dark" type="button" id="bLoad">Cargar código</button><label class="btn sec" style="display:inline-block">Elegir archivo<input type="file" id="fLoad" accept=".json,application/json,text/plain" hidden></label></div><div id="loadMsg"></div>'+
+  '<div class="actions" style="justify-content:space-between"><button class="btn sec" type="button" id="bClose">Cerrar</button><button class="btn sec small" type="button" id="bReset">Empezar de cero</button></div></div>';
+  document.body.appendChild(bg);
+  bg.addEventListener('click', function(e){ if(e.target===bg) closeModal(); });
+  var by=function(id){return document.getElementById(id);};
+  by('bClose').onclick=closeModal;
+  if(code){
+    by('bCopy').onclick=function(){ var t=by('codeOut'); t.select(); var ok=false; try{ ok=document.execCommand('copy'); }catch(e){} if(navigator.clipboard){ navigator.clipboard.writeText(code).then(function(){toast('Código copiado.');},function(){ if(ok) toast('Código copiado.'); else toast('Selecciónenlo y cópienlo a mano.'); }); } else toast(ok?'Código copiado.':'Selecciónenlo y cópienlo a mano.'); markSaved(); };
+    by('bDl').onclick=function(){ var blob=new Blob([code],{type:'text/plain'}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='partida_'+(S.team.name||'equipo').replace(/[^\w\-]+/g,'_')+'.json'; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove();},500); markSaved(); };
+  }
+  by('bLoad').onclick=function(){ try{ applyLoaded(fromCode(by('codeIn').value)); }catch(e){ by('loadMsg').innerHTML='<div class="missing">'+esc(e.message||'Código inválido.')+'</div>'; } };
+  by('fLoad').onchange=function(ev){ var f=ev.target.files[0]; if(!f) return; var rd=new FileReader(); rd.onload=function(){ try{ applyLoaded(fromCode(rd.result)); }catch(e){ by('loadMsg').innerHTML='<div class="missing">'+esc(e.message||'Archivo inválido.')+'</div>'; } }; rd.readAsText(f); };
+  by('bReset').onclick=function(){ if(window.confirm('¿Borrar toda la partida de este navegador? No se puede deshacer.')){ S=blank(); save(); current=null; closeModal(); render(); } };
+}
+function markSaved(){ if(S.done.n4 && !S.day1Saved){ S.day1Saved=true; save(); render(); } }
+function closeModal(){ var m=document.getElementById('modal'); if(m) m.remove(); }
+
+/* ---------- Utilidades ---------- */
+var toastT=null;
+function toast(msg){ var t=document.querySelector('.toast'); if(t) t.remove(); t=document.createElement('div'); t.className='toast'; t.setAttribute('role','status'); t.textContent=msg; document.body.appendChild(t); clearTimeout(toastT); toastT=setTimeout(function(){t.remove();},3200); }
+function shrink(file, cb){
+  var rd=new FileReader(); rd.onload=function(){ var img=new Image(); img.onload=function(){ var max=1400, w=img.width, h=img.height; if(w>max){ h=Math.round(h*max/w); w=max; } var c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); cb(c.toDataURL('image/jpeg',0.82)); }; img.onerror=function(){cb(null);}; img.src=rd.result; }; rd.readAsDataURL(file);
+}
+var DONE_MSG = {n1:'Nivel 1 completo. El socio quiere saber qué dice la IA.', n2:'Nivel 2 completo. ¡Atentos: el socio pide un agente!', n3:'Nivel 3 completo. Faltan los controles.', n4:'¡Día 1 completo! Guarden la partida antes de irse.', n5:'Nivel 5 completo. ¿Resistieron los controles?', n6:'¡Misión cumplida! Generen el reporte.'};
+
+/* ---------- Eventos ---------- */
+document.addEventListener('input', function(e){
+  var k=e.target.getAttribute('data-k'); if(!k) return;
+  set(k, e.target.value);
+  if(k.indexOf('n4.match')===0) return;
+  if(k==='team.name') document.getElementById('pTeam').textContent='Equipo: '+(e.target.value||'—');
+});
+document.addEventListener('change', function(e){
+  var t=e.target, ck=t.getAttribute('data-chk');
+  if(ck){ set(ck, t.checked); if(ck.indexOf('n3.riesgos')===0) render(); return; }
+  if(t.id==='fImg'){
+    var files=[].slice.call(t.files||[]); var pending=files.length; if(!pending) return;
+    files.forEach(function(f){ shrink(f, function(d){ if(d) S.n5.images.push({name:f.name,data:d}); if(--pending===0){ save(); render(); toast(memOnlyImages?'Capturas agregadas (sin espacio para guardarlas).':'Capturas agregadas.'); } }); });
+  }
+});
+document.addEventListener('keydown', function(e){ if((e.key==='Enter'||e.key===' ') && e.target.hasAttribute && e.target.hasAttribute('data-hunt')){ e.preventDefault(); e.target.click(); } if(e.key==='Escape') closeModal(); });
+document.addEventListener('click', function(e){
+  var el=e.target.closest('[data-go],[data-n1],[data-ag],[data-cls],[data-hunt],[data-complete],[data-delrow],[data-delimg],[data-open-save],#bStart,#bHunt,#bMatch,#bAddRow,#bPrint,#bPreview,#bSave');
+  if(!el) return;
+  if(el.id==='bSave' || el.hasAttribute('data-open-save')){ openSave(); return; }
+  if(el.hasAttribute('data-go')){ if(unlocked(el.getAttribute('data-go'))) go(el.getAttribute('data-go')); return; }
+  if(el.id==='bStart'){ if(!filled(S.team.name)||!filled(S.team.members)){ document.getElementById('miss-start').innerHTML='<div class="missing">Completen el nombre del equipo y los integrantes.</div>'; return; } go('n1'); return; }
+  if(el.hasAttribute('data-n1')){ set('n1.game.'+el.getAttribute('data-n1'), el.getAttribute('data-v')); render(); return; }
+  if(el.hasAttribute('data-ag')){ set('n3.quiz.'+el.getAttribute('data-ag'), el.getAttribute('data-v')); render(); return; }
+  if(el.hasAttribute('data-cls')){ set('n4.cls.'+el.getAttribute('data-cls'), el.getAttribute('data-v')); render(); return; }
+  if(el.hasAttribute('data-hunt')){ if(S.n2.hunt.checked) return; var i=el.getAttribute('data-hunt'); S.n2.hunt.sel[i]=!S.n2.hunt.sel[i]; save(); render(); return; }
+  if(el.id==='bHunt'){ S.n2.hunt.checked=true; save(); render(); toast('“Cazá el error”: '+huntScore()+' puntos.'); return; }
+  if(el.id==='bMatch'){ if(MATCH.some(function(m){return !S.n4.match[m.id];})){ toast('Elijan un control para cada riesgo.'); return; } S.n4.matchChecked=true; save(); render(); toast('Aciertos: '+matchCorrect()+' de '+MATCH.length+'.'); return; }
+  if(el.id==='bAddRow'){ S.n4.rows.push(newRow()); save(); render(); return; }
+  if(el.hasAttribute('data-delrow')){ var r=+el.getAttribute('data-delrow'); S.n4.rows.splice(r,1); S.n6.rev.splice(r,1); save(); render(); return; }
+  if(el.hasAttribute('data-delimg')){ S.n5.images.splice(+el.getAttribute('data-delimg'),1); save(); render(); return; }
+  if(el.hasAttribute('data-complete')){
+    var id=el.getAttribute('data-complete'); var m=REQ[id]();
+    var box=document.getElementById('miss-'+id);
+    if(m.length){ box.innerHTML='<div class="missing"><b>Les falta:</b><ul>'+m.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div>'; box.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+    var first=!S.done[id]; S.done[id]=true; save();
+    if(first) toast(DONE_MSG[id]);
+    var idx=LEVELS.findIndex(function(l){return l.id===id;});
+    if(id==='n4'){ render(); openSave(); return; }
+    go(LEVELS[idx+1].id); return;
+  }
+  if(el.id==='bPrint'){ document.getElementById('report').innerHTML=buildReport(); setTimeout(function(){ window.print(); }, 150); return; }
+  if(el.id==='bPreview'){ document.getElementById('previewBox').innerHTML='<div class="card rp">'+buildReport()+'</div>'; return; }
+});
+window.addEventListener('beforeprint', function(){ document.getElementById('report').innerHTML=buildReport(); });
+
+render();
+})();
+</script>
+</body>
+</html>
